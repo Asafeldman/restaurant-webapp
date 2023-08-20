@@ -15,12 +15,16 @@ This is a Java-based RESTful API for managing location data.
 1. Clone the repository.
 2. Configure your MongoDB connection in `MongoDBUtil.java`.
 3. Install project dependencies using Maven:
-   ...bash
-   cd appfront
-   mvn install
+
+- ...bash
+- cd appfront
+- mvn install
 
 4. Build and run the project:
-   mvn clean package
-   java -jar target/appfront-1.0-SNAPSHOT.jar
-   The application will start at "http://localhost:8080/appfrontLocations_war_exploded/api/locations."
+
+- mvn clean package
+- java -jar target/appfront-1.0-SNAPSHOT.jar
+
+5. The application will start at "http://localhost:8080/appfrontLocations_war_exploded/api/locations."
+   
 
