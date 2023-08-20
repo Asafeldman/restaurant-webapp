@@ -21,6 +21,7 @@ appfront/
 └── README.md
 
 
+
 ## API Endpoints
 
 - `GET /api/locations` - Retrieve a list of all locations.
