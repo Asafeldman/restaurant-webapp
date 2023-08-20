@@ -2,26 +2,6 @@
 
 This is a Java-based RESTful API for managing location data.
 
-## Project Structure
-
-appfront/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── com.app.appfrontlocations/
-│   │   │   │   ├── Location.java
-│   │   │   │   ├── LocationApp.java
-│   │   │   │   ├── LocationDAO.java
-│   │   │   │   ├── LocationResource.java
-│   │   │   │   ├── MongoDBUtil.java
-│   ├── resources/
-│   │   ├── META-INF/
-│   │   │   ├── beans.xml
-├── pom.xml
-└── README.md
-
-
-
 ## API Endpoints
 
 - `GET /api/locations` - Retrieve a list of all locations.
@@ -42,5 +22,5 @@ appfront/
 4. Build and run the project:
    mvn clean package
    java -jar target/appfront-1.0-SNAPSHOT.jar
-The application will start at "http://localhost:8080/appfrontLocations_war_exploded/api/locations."
+   The application will start at "http://localhost:8080/appfrontLocations_war_exploded/api/locations."
 
