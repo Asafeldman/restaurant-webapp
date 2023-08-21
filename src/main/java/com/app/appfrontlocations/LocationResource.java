@@ -22,6 +22,18 @@ public class LocationResource {
         return Response.status(Response.Status.NOT_FOUND).entity("No locations found").build();
     }
 
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLocationById(@PathParam("id") String id) {
+        Location location = locationDAO.getLocationById(id);
+
+        if (location != null) {
+            return Response.status(Response.Status.OK).entity(location).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("No locations found for id: " + id).build();
+    }
+
     @POST
     @Path("/add")
     @Produces(MediaType.APPLICATION_JSON)
