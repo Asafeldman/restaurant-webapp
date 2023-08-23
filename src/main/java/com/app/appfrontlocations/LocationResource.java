@@ -56,12 +56,8 @@ public class LocationResource {
         if (updatedLocation == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Location data is missing").build();
         }
-        String locationId = updatedLocation.getId();
-        String newName = updatedLocation.getName();
-        String newAddress = updatedLocation.getAddress();
-        String newStatus = updatedLocation.getStatus();
-        if (locationDAO.updateLocation(locationId, newName, newAddress, newStatus)) {
-            return Response.status(Response.Status.CREATED).entity(updatedLocation).build();
+        if (locationDAO.updateLocation(updatedLocation)) {
+            return Response.status(Response.Status.OK).entity(updatedLocation).build();
         }
         return Response.status(Response.Status.NOT_MODIFIED).build();
     }
@@ -74,8 +70,8 @@ public class LocationResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Location id is missing").build();
         }
         if (locationDAO.deleteLocation(id)) {
-            return Response.ok().status(Response.Status.NO_CONTENT)
-                    .entity("Location " + id + " deleted").build();
+            return Response.ok().status(Response.Status.OK)
+                    .entity("Location ID " + id + " deleted").build();
         }
         return Response.status(Response.Status.NOT_MODIFIED).build();
     }

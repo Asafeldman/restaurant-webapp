@@ -7,6 +7,7 @@ import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,20 +20,34 @@ public class LocationDAO {
     }
 
     public Location documentToLocation(Document document) {
-        String id = document.getString("_id");
-        String name = document.getString("_name");
-        String address = document.getString("_address");
-        String status = document.getString("_status");
-        return new Location(id, name, address, status);
+        Field[] fields = Location.class.getDeclaredFields();
+        Location location = new Location();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            if (document.containsKey(fieldName)) {
+                try {
+                    field.set(location, document.get(fieldName));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Error setting field value: " + e.getMessage(), e);
+                }
+            }
+        }
+        return location;
     }
 
     public Document locationToDocument(Location location) {
         Document document = new Document();
-        document.append("_id", location.getId());
-        document.append("_name", location.getName());
-        document.append("_address", location.getAddress());
-        document.append("_status", location.getStatus());
-        return document;
+        try {
+            Field[] fields = Location.class.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                document.append(field.getName(), field.get(location));
+            }
+            return document;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error creating document from Location: " + e.getMessage(), e);
+        }
     }
 
     public List<Location> getAllLocations() {
@@ -61,18 +76,15 @@ public class LocationDAO {
         }
     }
 
-    public boolean updateLocation(String locationId, String newName, String newAddress, String newStatus) {
+    public boolean updateLocation(Location updatedLocation) {
+        String locationId = updatedLocation.getId();
+
+        if (getLocationById(locationId) == null) {
+            throw new RuntimeException("Location with ID " + locationId + " does not exist");
+        }
+
         Document filter = new Document("_id", locationId);
-        Document updated = new Document();
-        if (newName != null) {
-            updated.append("_name", newName);
-        }
-        if (newAddress != null) {
-            updated.append("_address", newAddress);
-        }
-        if (newStatus != null && (newStatus.equals("Open") || newStatus.equals("Closed"))) {
-            updated.append("_status", newStatus);
-        }
+        Document updated = locationToDocument(updatedLocation);
         try {
             locationCollection.updateOne(filter, new Document("$set", updated));
             return true;
@@ -82,6 +94,11 @@ public class LocationDAO {
     }
 
     public boolean deleteLocation(String id) {
+
+        if (getLocationById(id) == null) {
+            throw new RuntimeException("Location with ID " + id + " does not exist");
+        }
+
         Bson filter = new Document("_id", id);
         try {
             locationCollection.deleteOne(filter);
@@ -90,6 +107,4 @@ public class LocationDAO {
             throw new RuntimeException("Error deleting location " + e.getMessage(), e);
         }
     }
-
-
 }

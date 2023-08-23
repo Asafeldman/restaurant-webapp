@@ -7,7 +7,7 @@ This is a Java-based RESTful API for managing location data.
 - `GET /api/locations` - Retrieve a list of all locations.
 - `GET /api/locations/{id}` - Retrieve details of a specific location by ID.
 - `POST /api/locations/add` - Add a new location.
-- `PUT /api/locations/update/{id}` - Update an existing location by ID.
+- `POST /api/locations/update` - Update an existing location.
 - `DELETE /api/locations/delete/{id}` - Delete a location by ID.
 
 ## Build and Run
