@@ -23,15 +23,14 @@ public class LocationResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/{name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getLocationById(@PathParam("id") String id) {
-        Location location = locationDAO.getLocationById(id);
-
+    public Response getLocationByName(@PathParam("name") String name) {
+        Location location = locationDAO.getLocationByField("_name", name);
         if (location != null) {
             return Response.status(Response.Status.OK).entity(location).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).entity("No locations found for id: " + id).build();
+        return Response.status(Response.Status.NOT_FOUND).entity("No locations named: " + name + " found").build();
     }
 
     @POST
@@ -62,16 +61,30 @@ public class LocationResource {
         return Response.status(Response.Status.NOT_MODIFIED).build();
     }
 
-    @DELETE
-    @Path("/delete/{id}")
+    @POST
+    @Path("/addorupdate")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteUser(@PathParam("id") String id) {
-        if (id == null) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addOrUpdateLocation(Location updatedLocation) {
+        if (updatedLocation == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Location data is missing").build();
+        }
+        if (locationDAO.addOrUpdateLocation(updatedLocation)) {
+            return Response.status(Response.Status.OK).entity(updatedLocation).build();
+        }
+        return Response.status(Response.Status.NOT_MODIFIED).build();
+    }
+
+    @DELETE
+    @Path("/delete/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@PathParam("name") String name) {
+        if (name == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Location id is missing").build();
         }
-        if (locationDAO.deleteLocation(id)) {
+        if (locationDAO.deleteLocation(name)) {
             return Response.ok().status(Response.Status.OK)
-                    .entity("Location ID " + id + " deleted").build();
+                    .entity("Location " + name + " deleted").build();
         }
         return Response.status(Response.Status.NOT_MODIFIED).build();
     }

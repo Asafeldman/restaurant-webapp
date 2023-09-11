@@ -1,7 +1,6 @@
 package com.app.appfrontlocations;
 
 public class Location {
-    private String _id;
     private String _name;
     private String _address;
     private String _status;
@@ -10,18 +9,13 @@ public class Location {
         // No-argument constructor for JSON deserialization
     }
 
-    public Location(String id, String name, String address, String status) {
-        if (id == null || name == null || address == null || status == null) {
+    public Location(String name, String address, String status) {
+        if (name == null || address == null || status == null) {
             throw new IllegalArgumentException("Fields cannot be null");
         }
-        _id = id;
         _name = name;
         _address = address;
         _status = status;
-    }
-
-    public String getId() {
-        return _id;
     }
 
     public String getName() {
@@ -34,10 +28,6 @@ public class Location {
 
     public String getStatus() {
         return _status;
-    }
-
-    public void setId(String id) {
-        _id = id;
     }
 
     public void setName(String name) {

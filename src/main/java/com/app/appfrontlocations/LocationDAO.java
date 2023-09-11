@@ -4,6 +4,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.FindIterable;
 
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -17,6 +20,8 @@ public class LocationDAO {
     public LocationDAO() {
         MongoClient mongoClient = new MongoDBUtil().getMongoClient();
         locationCollection = mongoClient.getDatabase("businessLocations").getCollection("locations");
+        IndexOptions indexOptions = new IndexOptions().unique(true);
+        locationCollection.createIndex(new Document("_name", 1), indexOptions);
     }
 
     public Location documentToLocation(Document document) {
@@ -60,8 +65,8 @@ public class LocationDAO {
         return locations;
     }
 
-    public Location getLocationById(String id) {
-        Document query = new Document("_id", id);
+    public Location getLocationByField(String fieldName, Object value) {
+        Document query = new Document(fieldName, value);
         Document result = locationCollection.find(query).first();
         return result != null ? documentToLocation(result) : null;
     }
@@ -77,13 +82,11 @@ public class LocationDAO {
     }
 
     public boolean updateLocation(Location updatedLocation) {
-        String locationId = updatedLocation.getId();
-
-        if (getLocationById(locationId) == null) {
-            throw new RuntimeException("Location with ID " + locationId + " does not exist");
+        String locationName = updatedLocation.getName();
+        if (getLocationByField("_name", locationName) == null) {
+            throw new RuntimeException("Location " + locationName + " does not exist");
         }
-
-        Document filter = new Document("_id", locationId);
+        Document filter = new Document("_name", locationName);
         Document updated = locationToDocument(updatedLocation);
         try {
             locationCollection.updateOne(filter, new Document("$set", updated));
@@ -93,13 +96,26 @@ public class LocationDAO {
         }
     }
 
-    public boolean deleteLocation(String id) {
 
-        if (getLocationById(id) == null) {
-            throw new RuntimeException("Location with ID " + id + " does not exist");
+    public boolean addOrUpdateLocation(Location location) {
+        String locationName = location.getName();
+        Document filter = new Document("_name", locationName);
+        Document updated = locationToDocument(location);
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        try {
+            UpdateResult result = locationCollection.updateOne(filter, new Document("$set", updated), options);
+            return result.getModifiedCount() > 0 || result.getUpsertedId() != null; // true if updated or inserted
+        } catch (Exception e) {
+            throw new RuntimeException("Error adding or updating location " + e.getMessage(), e);
         }
+    }
 
-        Bson filter = new Document("_id", id);
+
+    public boolean deleteLocation(String name) {
+        if (getLocationByField("_name", name) == null) {
+            throw new RuntimeException("Location name: " + name + " does not exist");
+        }
+        Bson filter = new Document("_name", name);
         try {
             locationCollection.deleteOne(filter);
             return true;
