@@ -1,14 +1,15 @@
 # AppFront - Locations API
 
-This is a Java-based RESTful API for managing location data.
+A Java-based RESTful API for managing restaurant location data.
 
 ## API Endpoints
 
 - `GET /api/locations` - Retrieve a list of all locations.
-- `GET /api/locations/{id}` - Retrieve details of a specific location by ID.
+- `GET /api/locations/{name}` - Retrieve details of a specific location by name.
 - `POST /api/locations/add` - Add a new location.
 - `POST /api/locations/update` - Update an existing location.
-- `DELETE /api/locations/delete/{id}` - Delete a location by ID.
+- `POST /api/locations/addorupdate` - Add a new location or update an existing location.
+- `DELETE /api/locations/delete/{name}` - Delete a location by ID.
 
 ## Build and Run
 
@@ -16,7 +17,7 @@ This is a Java-based RESTful API for managing location data.
 2. Configure your MongoDB connection in `MongoDBUtil.java`.
 3. Install project dependencies using Maven:
 
-- ...bash
+- ... bash
 - cd appfront
 - mvn install
 

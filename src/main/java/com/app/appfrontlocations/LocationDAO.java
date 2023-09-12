@@ -19,7 +19,9 @@ public class LocationDAO {
 
     public LocationDAO() {
         MongoClient mongoClient = new MongoDBUtil().getMongoClient();
-        locationCollection = mongoClient.getDatabase("businessLocations").getCollection("locations");
+        String dbName = "businessLocations";
+        String collectionName = "locations";
+        locationCollection = mongoClient.getDatabase(dbName).getCollection(collectionName);
         IndexOptions indexOptions = new IndexOptions().unique(true);
         locationCollection.createIndex(new Document("_name", 1), indexOptions);
     }
@@ -95,7 +97,6 @@ public class LocationDAO {
             throw new RuntimeException("Error updating location " + e.getMessage(), e);
         }
     }
-
 
     public boolean addOrUpdateLocation(Location location) {
         String locationName = location.getName();

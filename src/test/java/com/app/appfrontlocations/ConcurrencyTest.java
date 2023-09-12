@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class ConcurrencyTest {
-    private static final int NUM_THREADS = 3;
+    private static final int NUM_THREADS = 10;
     private final CountDownLatch startLatch = new CountDownLatch(1);
     private final AtomicInteger successfulThreads = new AtomicInteger(0);
 
@@ -23,7 +23,7 @@ public class ConcurrencyTest {
         LocationDAO locationDAO = new LocationDAO();
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
 
-        Location testLocation = new Location("TestLocation1", "TestAddress", "Closed");
+        Location testLocation = new Location("Happys0", "TestAddress", "Open");
 
         Runnable task = () -> {
             try {
