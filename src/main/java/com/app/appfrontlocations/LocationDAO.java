@@ -1,5 +1,8 @@
 package com.app.appfrontlocations;
 
+import com.app.appfrontlocations.exceptions.LocationOperationException;
+import com.app.appfrontlocations.exceptions.LocationConversionException;
+import com.app.appfrontlocations.exceptions.LocationNotFoundException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.FindIterable;
@@ -16,14 +19,19 @@ import java.util.List;
 
 public class LocationDAO {
     private final MongoCollection<Document> locationCollection;
+    private static final String DB_NAME = "businessLocations";
+    private static final String COLLECTION_NAME = "locations";
+    private static final String UNIQUE_INDEX = "_name";
 
     public LocationDAO() {
         MongoClient mongoClient = new MongoDBUtil().getMongoClient();
-        String dbName = "businessLocations";
-        String collectionName = "locations";
-        locationCollection = mongoClient.getDatabase(dbName).getCollection(collectionName);
+        locationCollection = mongoClient.getDatabase(DB_NAME).getCollection(COLLECTION_NAME);
+        createUniqueIndex();
+    }
+
+    private void createUniqueIndex() {
         IndexOptions indexOptions = new IndexOptions().unique(true);
-        locationCollection.createIndex(new Document("_name", 1), indexOptions);
+        locationCollection.createIndex(new Document(UNIQUE_INDEX, 1), indexOptions);
     }
 
     public Location documentToLocation(Document document) {
@@ -35,8 +43,8 @@ public class LocationDAO {
             if (document.containsKey(fieldName)) {
                 try {
                     field.set(location, document.get(fieldName));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Error setting field value: " + e.getMessage(), e);
+                } catch (Exception e) {
+                    throw new LocationConversionException("Error creating location from document: " + e.getMessage(), e);
                 }
             }
         }
@@ -52,8 +60,8 @@ public class LocationDAO {
                 document.append(field.getName(), field.get(location));
             }
             return document;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error creating document from Location: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new LocationConversionException("Error creating document from location: " + e.getMessage(), e);
         }
     }
 
@@ -79,49 +87,48 @@ public class LocationDAO {
             locationCollection.insertOne(document);
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error inserting location " + e.getMessage(), e);
+            throw new LocationOperationException("Error inserting location " + e.getMessage(), e);
         }
     }
 
     public boolean updateLocation(Location updatedLocation) {
         String locationName = updatedLocation.getName();
-        if (getLocationByField("_name", locationName) == null) {
-            throw new RuntimeException("Location " + locationName + " does not exist");
+        if (getLocationByField(UNIQUE_INDEX, locationName) == null) {
+            throw new LocationNotFoundException("Location" + locationName + " not found");
         }
-        Document filter = new Document("_name", locationName);
+        Document filter = new Document(UNIQUE_INDEX, locationName);
         Document updated = locationToDocument(updatedLocation);
         try {
             locationCollection.updateOne(filter, new Document("$set", updated));
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error updating location " + e.getMessage(), e);
+            throw new LocationOperationException("Error updating location " + e.getMessage(), e);
         }
     }
 
     public boolean addOrUpdateLocation(Location location) {
         String locationName = location.getName();
-        Document filter = new Document("_name", locationName);
+        Document filter = new Document(UNIQUE_INDEX, locationName);
         Document updated = locationToDocument(location);
         UpdateOptions options = new UpdateOptions().upsert(true);
         try {
             UpdateResult result = locationCollection.updateOne(filter, new Document("$set", updated), options);
-            return result.getModifiedCount() > 0 || result.getUpsertedId() != null; // true if updated or inserted
+            return result.getModifiedCount() > 0 || result.getUpsertedId() != null;
         } catch (Exception e) {
-            throw new RuntimeException("Error adding or updating location " + e.getMessage(), e);
+            throw new LocationOperationException("Error adding or updating location " + e.getMessage(), e);
         }
     }
 
-
     public boolean deleteLocation(String name) {
-        if (getLocationByField("_name", name) == null) {
-            throw new RuntimeException("Location name: " + name + " does not exist");
+        if (getLocationByField(UNIQUE_INDEX, name) == null) {
+            throw new LocationNotFoundException("Location" + name + " not found");
         }
-        Bson filter = new Document("_name", name);
+        Bson filter = new Document(UNIQUE_INDEX, name);
         try {
             locationCollection.deleteOne(filter);
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting location " + e.getMessage(), e);
+            throw new LocationOperationException("Error deleting location " + e.getMessage(), e);
         }
     }
 }

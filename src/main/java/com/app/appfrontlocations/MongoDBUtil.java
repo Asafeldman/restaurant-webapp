@@ -17,6 +17,7 @@ public class MongoDBUtil {
         mongoClient = MongoClients.create(settings);
     }
 
+
     public MongoClient getMongoClient() {
         return mongoClient;
     }
