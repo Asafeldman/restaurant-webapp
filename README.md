@@ -27,5 +27,28 @@ A Java-based RESTful API for managing restaurant location data.
 - java -jar target/appfront-1.0-SNAPSHOT.jar
 
 5. The application will start at "http://localhost:8080/appfrontLocations_war_exploded/api/locations."
-   
 
+## Project Structure
+
+```
+appfront/
+└── src/
+    └── main/
+        ├── java/
+        │   └── com.app.appfrontlocations/
+        │       ├── Location
+        │       ├── LocationApp
+        │       ├── LocationDAO
+        │       ├── LocationResource
+        │       └── MongoDBUtil
+        ├── exceptions/
+        │   └── java/
+        │       └── com.app.appfrontlocations/
+        │           ├── LocationConversionException
+        │           ├── LocationNotFoundException
+        │           └── LocationOperationException
+        └── test/
+            └── java/
+                └── com.app.appfrontlocations/
+                    └── ConcurrencyTest
+```
