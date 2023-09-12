@@ -45,6 +45,4 @@ public class ConcurrencyTest {
         executorService.awaitTermination(10, TimeUnit.SECONDS);
         assertEquals(1, successfulThreads.get());
     }
-
-
 }
