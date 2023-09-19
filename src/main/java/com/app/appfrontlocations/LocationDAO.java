@@ -34,6 +34,14 @@ public class LocationDAO {
         locationCollection.createIndex(new Document(UNIQUE_INDEX, 1), indexOptions);
     }
 
+    public void dropLocationCollection() {
+        locationCollection.drop();
+    }
+
+    public int getNumLocations() {
+        return (int) locationCollection.countDocuments();
+    }
+
     public Location documentToLocation(Document document) {
         Field[] fields = Location.class.getDeclaredFields();
         Location location = new Location();
