@@ -1,4 +1,4 @@
-# AppFront - Locations API
+# Restaurant Locations API Webapp
 
 A Java-based RESTful API for managing restaurant location data.
 
